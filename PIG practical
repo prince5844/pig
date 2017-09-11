@@ -1,0 +1,141 @@
+ emp.txt
+  101|ename|20000
+  102|ename1|30000
+  103|ename2|40000
+
+---------------------------------------------
+  LOCAL MODE
+---------------------------------------------
+a = load '/emp.txt' using PigStorage('|');
+----------------------------------
+change emp.txt
+101|ename|20000
+102|ename1|30000
+103ename2|40000
+
+NOW LOAD AGAIN emp.txt
+
+a = load 'emp.txt' using PigStorage('|');
+b = foreach a generate $0;  //read data row by row
+DUMP b;                    // used to display the data in sell itself
+store b into 'pigout3';     //store command used to store file into a given location
+
+-------------------------------------------------------
+a = load 'pig23may/emp.txt'  using PigStorage('|') as (eid:int,ename:chararray,esal:int); //give schema
+b =  filter a by  esal ==30000;  //filter the data by matching condition
+ dump b 
+--------------------------------------------------------
+DESCRIBE b; // used display internal schema of data
+
+illustrate b;
+--------------------------
+modify emp.txt
+--------------------------
+a = load 'pigday6/emp.txt'  using PigStorage('|') as (eid:int,ename:chararray,esal:int);
+
+orderdata = order a by esal;   //sort data according to esal
+dump orderdata;
+----------------------------------------
+Group By
+----------------------------------------
+
+grunt> a = load '/PIG/emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int); 
+
+grunt> b = group a by eid;
+grunt> dump b;
+
+-----------------------------------------------------
+ inner Join 
+-----------------------------------------------------
+
+grunt> a = load 'PIG/emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int); 
+
+grunt> b = load '/PIG/dept.txt' using PigStorage('|') as(deptid:int,eid:int,dname:chararray,dloc:chararray); 
+grunt> joinresult = join a by eid,b by eid;
+grunt> dump joinresult;
+
+-------------------------------------------------------
+Left join
+-------------------------------------------------------
+leftjoin = join a by eid left ,b by eid;
+ store leftjoin into '/PIG/PIGOUTJOIN'
+-------------------------------------------
+Right join
+-------------------------------------------
+
+rigthjoin = join a by eid right ,b by eid;
+ store leftjoin into '/PIG/PIGOUTJOIN'
+-----------------------------------------
+CROSS 
+-------------------------------------------
+a = load '/PIG/emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int); 
+
+ b = load '/PIG/dept.txt' using PigStorage('|') as(deptid:int,eid:int,dname:chararray,dloc:chararray); 
+crossvar = cross a,b;
+store crossvar into '/PIG/cout';
+
+------------------------------------
+SCRIPT mode
+------------------------------------
+pig -x local <<script.pig>>
+---------------------------------
+LIMIT
+----------------------------------
+LIMIT crossvar 5;
+---------------------------------
+explain a;
+----------------------------------
+FLATTEN
+-----------------------------------
+a = load 'emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int);
+
+ groupdata = group  a by eid;
+ flatvar = foreach groupdata generate  group ,FLATTEN(a);
+ dump flatvar;
+------------------------------------------------------------
+COUNT
+-----------------------------------------------------------
+a = load '/PIG/emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int);
+
+ groupdata = group  a by eid;
+ countvar = foreach groupdata generate  group ,COUNT(a);
+ dump countvar;
+---------------------------------------------------------
+MIN, MAX,SUM
+---------------------------------------------------------
+a = load '/PIG/emp.txt' using PigStorage('|') as(eid:int,ename:chararray,esal:int);
+
+ groupdata = group  a by eid;
+ countvar = foreach groupdata generate  group ,MAX(a.esal);
+
+ dump countvar;-rw-
+
+--------------------------------------------------------------
+DISTINCT
+---------------------------------------------------------------
+disdata = distinct a;
+dump disdata;
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
